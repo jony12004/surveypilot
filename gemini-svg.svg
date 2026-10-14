@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Fondo circular degradado -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+    <linearGradient id="planeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)" />
+  
+  <!-- Anillos de Radar -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#334155" stroke-width="6" stroke-dasharray="10 10" />
+  <circle cx="256" cy="256" r="100" fill="none" stroke="#334155" stroke-width="6" />
+  
+  <!-- Líneas de Radar Cruzadas -->
+  <line x1="256" y1="56" x2="256" y2="456" stroke="#334155" stroke-width="4" />
+  <line x1="56" y1="256" x2="456" y2="256" stroke="#334155" stroke-width="4" />
+  
+  <!-- Avión de papel estilizado (SurveyPilot) -->
+  <path d="M140 256 L380 150 L270 370 L220 280 Z" fill="url(#planeGrad)" />
+  <path d="M220 280 L256 256 L380 150 Z" fill="#ffffff" opacity="0.4" />
+</svg>
