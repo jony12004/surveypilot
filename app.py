@@ -199,10 +199,13 @@ encuestas_dinamicas = obtener_encuestas_publicadas()
 ENCUESTAS_TOTALES = encuestas_dinamicas + ENCUESTAS_BASE_DEFAULT
 
 # --- CABECERA PRINCIPAL ---
-st.title(icon.svg + "SurveyPilot")
-st.caption("Radar Inteligente & Agregador de Encuestas en Tiempo Real")
+col_logo, col_texto = st.columns([0.1, 0.9])
+with col_logo:
+    st.image("icon.svg", width=65)
+with col_texto:
+    st.title("SurveyPilot")
+    st.caption("Radar Inteligente & Agregador de Encuestas en Tiempo Real")
 
-# --- DETECTAR SI ESTAMOS EN MODO ADMIN (Vía URL) ---
 # Comprueba si el enlace web termina en ?admin=true
 query_params = st.query_params
 es_admin = query_params.get("admin") == "true"
