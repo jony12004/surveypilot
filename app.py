@@ -6,7 +6,7 @@ from datetime import datetime
 # --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(
     page_title="SurveyPilot - Radar de Encuestas en Tiempo Real",
-    page_icon="gemini-svg.svg",
+    page_icon="icon.svg",
     layout="wide"
 )
 
@@ -202,6 +202,11 @@ ENCUESTAS_TOTALES = encuestas_dinamicas + ENCUESTAS_BASE_DEFAULT
 st.title("✈️ SurveyPilot")
 st.caption("Radar Inteligente & Agregador de Encuestas en Tiempo Real")
 
+# --- DETECTAR SI ESTAMOS EN MODO ADMIN (Vía URL) ---
+# Comprueba si el enlace web termina en ?admin=true
+query_params = st.query_params
+es_admin = query_params.get("admin") == "true"
+
 # --- BARRA LATERAL (Filtros de usuario) ---
 with st.sidebar:
     st.header("🎯 Filtros Rápidos")
@@ -232,8 +237,11 @@ if filtro_categoria:
 
 encuestas_filtradas = sorted(encuestas_filtradas, key=lambda x: x["ratio_eur_hora"], reverse=True)
 
-# --- PESTAÑAS NAVEGACIÓN ---
-tabs = st.tabs(["⚡ Radar en Vivo", "➕ Registrar Encuesta", "📊 Historial & Balance", "🔒 Panel Admin"])
+# --- PESTAÑAS NAVEGACIÓN (Dinámicas según si eres admin o no) ---
+if es_admin:
+    tabs = st.tabs(["⚡ Radar en Vivo", "➕ Registrar Encuesta", "📊 Historial & Balance", "🔒 Panel Admin"])
+else:
+    tabs = st.tabs(["⚡ Radar en Vivo", "➕ Registrar Encuesta", "📊 Historial & Balance"])
 
 # === PESTAÑA 1: RADAR DE ENCUESTAS ===
 with tabs[0]:
@@ -315,53 +323,54 @@ with tabs[2]:
     else:
         st.info("Sin registros acumulados aún.")
 
-# === PESTAÑA 4: PANEL DE ADMINISTRACIÓN INTELIGENTE ===
-with tabs[3]:
-    st.subheader("🔒 Panel de Control del Creador")
-    clave_admin = st.text_input("Introduce la clave de Administrador:", type="password")
-    
-    if clave_admin == "admin123":
-        st.success("Acceso concedido como Administrador de SurveyPilot")
+# === PESTAÑA 4: PANEL DE ADMINISTRACIÓN (Solo visible con ?admin=true) ===
+if es_admin:
+    with tabs[3]:
+        st.subheader("🔒 Panel de Control del Creador")
+        clave_admin = st.text_input("Introduce la clave de Administrador:", type="password")
         
-        st.markdown("### 📢 Publicar Nueva Oferta / Encuesta")
-        
-        with st.form("form_publicar_oferta"):
-            col_p1, col_p2 = st.columns(2)
-            with col_p1:
-                pub_titulo = st.text_input("Título / Tema de la Encuesta:", placeholder="Ej. Encuesta de Tecnología")
-                pub_plat = st.text_input("Plataforma:", placeholder="Ej. AttaPoll, Freecash, Heycash...")
-                pub_pago = st.number_input("Pago (€):", min_value=0.10, value=2.50, step=0.10)
-                pub_duracion = st.number_input("Duración (minutos):", min_value=1, value=10, step=1)
+        if clave_admin == "admin123":
+            st.success("Acceso concedido como Administrador de SurveyPilot")
             
-            with col_p2:
-                pub_cat = st.selectbox("Categoría:", ["Investigación Académica", "Prueba de Software / UX", "Estudio de Mercado", "Entretenimiento", "Consumo", "Consumo y Entretenimiento", "Política y Sociedad"])
-                pub_paises = st.text_input("Países permitidos:", value="España, México, Internacional")
-                pub_metodo = st.text_input("Método de cobro:", value="PayPal / Gift Cards")
-                pub_confi = st.selectbox("Fiabilidad:", ["Altísimo", "Muy Alto", "Alto", "Medio-Alto", "Medio"])
+            st.markdown("### 📢 Publicar Nueva Oferta / Encuesta")
             
-            pub_enlace = st.text_input("🔗 Enlace de Referido / Destino:", placeholder="Déjalo en blanco para usar tu enlace guardado automáticamente de esa plataforma.")
-            
-            btn_publicar = st.form_submit_button("🚀 Publicar en el Radar", use_container_width=True)
-            
-            if btn_publicar:
-                if pub_titulo and pub_plat:
-                    enlace_final = pub_enlace.strip()
-                    if enlace_final == "":
-                        enlace_guardado = obtener_enlace_afiliado(pub_plat)
-                        if enlace_guardado:
-                            enlace_final = enlace_guardado
-                            st.info(f"💡 Usando automáticamente tu enlace guardado de **{pub_plat}**: {enlace_final}")
+            with st.form("form_publicar_oferta"):
+                col_p1, col_p2 = st.columns(2)
+                with col_p1:
+                    pub_titulo = st.text_input("Título / Tema de la Encuesta:", placeholder="Ej. Encuesta de Tecnología")
+                    pub_plat = st.text_input("Plataforma:", placeholder="Ej. AttaPoll, Freecash, Heycash...")
+                    pub_pago = st.number_input("Pago (€):", min_value=0.10, value=2.50, step=0.10)
+                    pub_duracion = st.number_input("Duración (minutos):", min_value=1, value=10, step=1)
+                
+                with col_p2:
+                    pub_cat = st.selectbox("Categoría:", ["Investigación Académica", "Prueba de Software / UX", "Estudio de Mercado", "Entretenimiento", "Consumo", "Consumo y Entretenimiento", "Política y Sociedad"])
+                    pub_paises = st.text_input("Países permitidos:", value="España, México, Internacional")
+                    pub_metodo = st.text_input("Método de cobro:", value="PayPal / Gift Cards")
+                    pub_confi = st.selectbox("Fiabilidad:", ["Altísimo", "Muy Alto", "Alto", "Medio-Alto", "Medio"])
+                
+                pub_enlace = st.text_input("🔗 Enlace de Referido / Destino:", placeholder="Déjalo en blanco para usar tu enlace guardado automáticamente.")
+                
+                btn_publicar = st.form_submit_button("🚀 Publicar en el Radar", use_container_width=True)
+                
+                if btn_publicar:
+                    if pub_titulo and pub_plat:
+                        enlace_final = pub_enlace.strip()
+                        if enlace_final == "":
+                            enlace_guardado = obtener_enlace_afiliado(pub_plat)
+                            if enlace_guardado:
+                                enlace_final = enlace_guardado
+                                st.info(f"💡 Usando automáticamente tu enlace guardado de **{pub_plat}**")
+                            else:
+                                enlace_final = "https://www.google.com"
+                                st.warning(f"⚠️ No hay enlace guardado para {pub_plat}.")
                         else:
-                            enlace_final = "https://www.google.com"
-                            st.warning(f"⚠️ No hay enlace guardado para {pub_plat}. Añade uno la próxima vez para recordarlo.")
-                    else:
-                        guardar_enlace_afiliado(pub_plat, enlace_final)
-                        st.success(f"💾 Nuevo enlace de afiliado guardado para '{pub_plat}'.")
+                            guardar_enlace_afiliado(pub_plat, enlace_final)
+                            st.success(f"💾 Nuevo enlace guardado para '{pub_plat}'.")
 
-                    publicar_encuesta_db(pub_titulo, pub_plat, pub_pago, pub_duracion, pub_cat, pub_paises, pub_metodo, enlace_final, pub_confi)
-                    st.success("¡Oferta publicada correctamente en el Radar!")
-                else:
-                    st.error("Rellena al menos el Título y la Plataforma.")
-                    
-    elif clave_admin != "":
-        st.error("Clave incorrecta")
+                        publicar_encuesta_db(pub_titulo, pub_plat, pub_pago, pub_duracion, pub_cat, pub_paises, pub_metodo, enlace_final, pub_confi)
+                        st.success("¡Oferta publicada correctamente en el Radar!")
+                    else:
+                        st.error("Rellena al menos el Título y la Plataforma.")
+                        
+        elif clave_admin != "":
+            st.error("Clave incorrecta")
