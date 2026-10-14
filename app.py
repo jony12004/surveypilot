@@ -199,7 +199,7 @@ encuestas_dinamicas = obtener_encuestas_publicadas()
 ENCUESTAS_TOTALES = encuestas_dinamicas + ENCUESTAS_BASE_DEFAULT
 
 # --- CABECERA PRINCIPAL ---
-st.title("✈️ SurveyPilot")
+st.title(icon.svg + "SurveyPilot")
 st.caption("Radar Inteligente & Agregador de Encuestas en Tiempo Real")
 
 # --- DETECTAR SI ESTAMOS EN MODO ADMIN (Vía URL) ---
